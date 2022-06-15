@@ -1,13 +1,13 @@
+import torch.nn.functional as F
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from tqdm import trange
 import numpy as np
-import matplotlib.pyplot as plt
+import time
+import os
 
 from test import test
-
 
 if torch.cuda.is_available():
     device = torch.device("cuda:0")
@@ -54,12 +54,12 @@ class Net(nn.Module):
 
 net = Net().to(device)
 
-optimizer = optim.Adam(net.parameters(), lr=0.001)
+optimizer = optim.Adam(net.parameters(), lr=0.0005)
 loss_function = nn.MSELoss()
 
 
 def train(net, device):
-    EPOCHS = 10
+    EPOCHS = 7
     BATCH_SIZE = 100
 
     X = torch.tensor(np.array([i[0]
@@ -87,3 +87,9 @@ def train(net, device):
 
 
 train(net, device)
+accuracy = test(net, device)
+
+models_path = '../models/'
+model_name = f"{time.time()}_Acc{accuracy}_modelweights.pth"
+
+torch.save(net.state_dict(), os.path.join(models_path, model_name))

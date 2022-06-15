@@ -32,3 +32,4 @@ def test(net, device):
                 correct += 1
 
     print("Acc:", round(correct/total, 3))
+    return round(correct/total, 3)

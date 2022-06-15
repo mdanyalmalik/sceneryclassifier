@@ -3,8 +3,9 @@ import numpy as np
 import os
 from tqdm import tqdm
 
-REBUILD_DATA = False  # Set to true to rebuild data
+REBUILD_DATA = False  # Set to true to build labelled data files
 
+# refer to README file to download dataset
 trainset_dir = "data/seg_train/"
 testset_dir = "data/seg_test/"
 

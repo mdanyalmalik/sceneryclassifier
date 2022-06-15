@@ -129,4 +129,10 @@ dmypy.json
 .pyre/
 
 #ignore data
-/train/data/
+/train/data/*
+
+#ignore todolist
+/todolist.txt
+
+#ignore models
+/models/*.pth
