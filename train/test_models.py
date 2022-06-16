@@ -62,7 +62,7 @@ elif test_mode == 1:
     for model in os.listdir('../models/'):
         acc = 0
 
-        net.load_state_dict(torch.load(os.path.join('../models/', model1)))
+        net.load_state_dict(torch.load(os.path.join('../models/', model)))
         for test_run in range(test_runs):
             acc += test(net, device, print_acc=False)
         acc /= test_runs
