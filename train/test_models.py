@@ -58,9 +58,9 @@ if test_mode == 0:
     print('Avg acc:', acc)
 
 elif test_mode == 1:
-    acc = 0
     models = {}
     for model in os.listdir('../models/'):
+        acc = 0
 
         net.load_state_dict(torch.load(os.path.join('../models/', model1)))
         for test_run in range(test_runs):
