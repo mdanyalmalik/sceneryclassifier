@@ -136,3 +136,9 @@ dmypy.json
 
 #ignore models
 /models/*.pth
+
+#ignore flagged
+/interface/flagged/*
+
+#ignore examples
+/interface/examples/*

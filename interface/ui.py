@@ -1,10 +1,11 @@
+import gradio as gr
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
+import cv2
+import random
 import os
-
-from test import test
-
 
 if torch.cuda.is_available():
     device = torch.device("cuda:0")
@@ -47,34 +48,40 @@ class Net(nn.Module):
 net = Net()
 net.to(device)
 
-test_mode = 1  # 0 for single model, 1 for comparison
+model = "1655322438.4798265_Acc0.693_modelweights.pth"
+net.load_state_dict(torch.load(os.path.join('../models/', model)))
 
-# enter model filename here (for single model mode)
-model1 = "1655321975.6330233_Acc0.647_modelweights.pth"
+labels = ['Buildings', 'Forest', 'Glacier', 'Mountain', 'Sea', 'Street']
 
-test_runs = 10  # number of times to test and avg
 
-if test_mode == 0:
-    acc = 0
-    net.load_state_dict(torch.load(os.path.join('../models/', model1)))
-    for test_run in range(test_runs):
-        acc += test(net, device)
-    acc /= test_runs
-    print('Avg acc:', acc)
+def examples():
+    number = 8
+    egs = []
+    for i in range(number):
+        imgs = os.listdir('examples')
+        eg = imgs[random.randrange(0, len(imgs))]
+        egs.append(os.path.join('examples/', eg))
 
-elif test_mode == 1:
-    models = {}
-    for model in os.listdir('../models/'):
-        acc = 0
+    return egs
 
-        net.load_state_dict(torch.load(os.path.join('../models/', model)))
-        for test_run in range(test_runs):
-            acc += test(net, device, print_acc=False)
-        acc /= test_runs
 
-        print(f"Model: {model}\nAvg acc: {acc}\n")
+def predict(img):
+    try:
+        img = torch.tensor(img).view(-1, 3, 150, 150)
+        img = img.to(device)
+        img = img.float()
 
-        models.update({model: acc})
+        with torch.no_grad():
+            output = net(img)
 
-    best_model = sorted(models, key=models.get)[-1]
-    print("\nBest Model:", best_model)
+            pred = [output[0][i].item() for i in range(len(labels))]
+
+    except:
+        pred = [0 for i in range(len(labels))]
+
+    weightage = {labels[i]: pred[i] for i in range(len(labels))}
+    return weightage
+
+
+gr.Interface(fn=predict, inputs=gr.Image(shape=(150, 150)),
+             outputs='label', examples=examples()).launch()
