@@ -5,7 +5,7 @@ from tqdm import tqdm
 import numpy as np
 
 
-def test(net, device):
+def test(net, device, print_acc=True):
     SIZE = 150
 
     testing_data = np.load("data/testing_data.npy", allow_pickle=True)
@@ -31,5 +31,6 @@ def test(net, device):
             if (np.eye(6)[torch.argmax(output[i])] == y[i]).all():
                 correct += 1
 
-    print("Acc:", round(correct/total, 3))
+    if print_acc:
+        print("Acc:", round(correct/total, 3))
     return round(correct/total, 3)

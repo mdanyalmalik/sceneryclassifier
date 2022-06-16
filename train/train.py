@@ -59,7 +59,7 @@ loss_function = nn.MSELoss()
 
 
 def train(net, device):
-    EPOCHS = 7
+    EPOCHS = 20
     BATCH_SIZE = 100
 
     X = torch.tensor(np.array([i[0]
