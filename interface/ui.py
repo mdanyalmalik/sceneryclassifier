@@ -53,6 +53,8 @@ net.load_state_dict(torch.load(os.path.join('../models/', model)))
 
 labels = ['Buildings', 'Forest', 'Glacier', 'Mountain', 'Sea', 'Street']
 
+title = "Scenery Classifier"
+
 
 def examples():
     number = 8
@@ -70,6 +72,7 @@ def predict(img):
         img = torch.tensor(img).view(-1, 3, 150, 150)
         img = img.to(device)
         img = img.float()
+        img = img / 255.0
 
         with torch.no_grad():
             output = net(img)
@@ -84,4 +87,4 @@ def predict(img):
 
 
 gr.Interface(fn=predict, inputs=gr.Image(shape=(150, 150)),
-             outputs='label', examples=examples()).launch()
+             outputs='label', title=title, examples=examples()).launch()
