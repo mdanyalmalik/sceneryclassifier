@@ -22,13 +22,13 @@ training_data = np.load("data/training_data.npy", allow_pickle=True)
 
 net = Net().to(device)
 
-optimizer = optim.Adam(net.parameters(), lr=0.001)
+optimizer = optim.Adam(net.parameters(), lr=0.0005)
 loss_function = nn.MSELoss()
 
 
 def train(net, device):
     EPOCHS = 10
-    BATCH_SIZE = 50
+    BATCH_SIZE = 100
 
     X = torch.tensor(np.array([i[0]
                      for i in training_data])).view(-1, 3, 150, 150)

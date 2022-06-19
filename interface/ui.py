@@ -18,10 +18,10 @@ else:
 net = Net()
 net.to(device)
 
-model = "1655643142.677759_Acc0.59_modelweights.pth"
+model = "1655322438.4798265_Acc0.693_modelweights.pth"
 net.load_state_dict(torch.load(os.path.join('../models/', model)))
 
-labels = ['Buildings', 'Forest', 'Glacier', 'Mountain', 'Sea', 'Street']
+labels = ['Buildings', 'Forest', 'Glacier', 'Mountains', 'Sea', 'Street']
 
 title = "Scenery Classifier"
 
