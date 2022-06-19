@@ -1,34 +1,39 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from tqdm import tqdm
+from torchvision import transforms, datasets
 import numpy as np
 
 
 def test(net, device, print_acc=True):
     SIZE = 100
 
-    testing_data = np.load("data/testing_data.npy", allow_pickle=True)
-    np.random.shuffle(testing_data)
-    testing_data = testing_data[:SIZE]
+    data_dir = 'data/seg_test'
 
-    X = torch.tensor(np.array([i[0]
-                     for i in testing_data])).view(-1, 3, 150, 150)
-    X = X / 255.0
-    y = np.array([i[1] for i in testing_data])
+    mean = np.array([0.5, 0.5, 0.5])
+    std = np.array([0.25, 0.25, 0.25])
 
-    X = X.to(device)
+    data_transforms = transforms.Compose([
+        transforms.Resize((150, 150)),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize(mean, std)])
+
+    image_dataset = datasets.ImageFolder(data_dir, data_transforms)
+    data_loader = torch.utils.data.DataLoader(
+        image_dataset, batch_size=SIZE, shuffle=True)
+
+    inputs, labels = next(iter(data_loader))
+    inputs, labels = inputs.to(device), labels.to(device)
 
     correct = 0
     total = 0
 
     with torch.no_grad():
-        output = net(X.view(-1, 3, 150, 150))
+        output = net(inputs)
         output = output.to(torch.device("cpu"))
         total += len(output)
 
-        for i in range(len(y)):
-            if (np.eye(6)[torch.argmax(output[i])] == y[i]).all():
+        for i, label in enumerate(labels):
+            if (torch.argmax(output[i]) == label):
                 correct += 1
 
     if print_acc:

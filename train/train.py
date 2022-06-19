@@ -35,8 +35,6 @@ image_dataset = datasets.ImageFolder(data_dir, data_transforms)
 data_loader = torch.utils.data.DataLoader(
     image_dataset, batch_size=32, shuffle=True)
 
-class_names = image_dataset.classes
-
 
 net = Net().to(device)
 
