@@ -1,8 +1,10 @@
+from random import shuffle
 import torch.nn.functional as F
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from tqdm import trange
+from torchvision import transforms, datasets, models
+from tqdm import tqdm
 import numpy as np
 import time
 import os
@@ -12,13 +14,29 @@ from net import Net
 
 if torch.cuda.is_available():
     device = torch.device("cuda:0")
-    print("Running on gpu")
+    print("Running on GPU")
 else:
     device = torch.device("cpu")
     print("Running on CPU")
 
 
-training_data = np.load("data/training_data.npy", allow_pickle=True)
+data_dir = 'data/seg_train'
+
+mean = np.array([0.5, 0.5, 0.5])
+std = np.array([0.25, 0.25, 0.25])
+
+data_transforms = transforms.Compose([
+    transforms.Resize((150, 150)),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize(mean, std)])
+
+image_dataset = datasets.ImageFolder(data_dir, data_transforms)
+data_loader = torch.utils.data.DataLoader(
+    image_dataset, batch_size=32, shuffle=True)
+
+class_names = image_dataset.classes
+
 
 net = Net().to(device)
 
@@ -28,25 +46,18 @@ loss_function = nn.MSELoss()
 
 def train(net, device):
     EPOCHS = 10
-    BATCH_SIZE = 100
-
-    X = torch.tensor(np.array([i[0]
-                     for i in training_data])).view(-1, 3, 150, 150)
-    X = X / 255.0
-    y = torch.tensor(np.array([i[1] for i in training_data]))
-
-    X = X.to(device)
-    y = y.to(device)
 
     for epoch in range(EPOCHS):
-        for i in trange(0, len(X), BATCH_SIZE):
-            batch_X = X[i:i+BATCH_SIZE].view(-1, 3, 150, 150)
-            batch_y = y[i:i+BATCH_SIZE].float()
+        for inputs, labels in tqdm(data_loader):
+            inputs = inputs.to(device)
+            labels = torch.tensor(np.array([np.eye(6)[i] for i in labels]))
+            labels = labels.float().to(device)
 
             net.zero_grad()
 
-            outputs = net(batch_X)
-            loss = loss_function(outputs, batch_y)
+            outputs = net(inputs)
+
+            loss = loss_function(outputs, labels)
             loss.backward()
             optimizer.step()
 
