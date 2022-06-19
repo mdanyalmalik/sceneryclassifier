@@ -6,7 +6,7 @@ import numpy as np
 
 
 def test(net, device, print_acc=True):
-    SIZE = 150
+    SIZE = 100
 
     testing_data = np.load("data/testing_data.npy", allow_pickle=True)
     np.random.shuffle(testing_data)
