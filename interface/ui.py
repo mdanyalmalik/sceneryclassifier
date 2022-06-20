@@ -1,9 +1,7 @@
 import gradio as gr
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from torchvision import transforms
 import numpy as np
-import cv2
 import random
 import os
 
@@ -18,10 +16,18 @@ else:
 net = Net()
 net.to(device)
 
-model = "1655322438.4798265_Acc0.693_modelweights.pth"
+model = "1655684183.7481008_Acc0.87_modelweights.pth"
 net.load_state_dict(torch.load(os.path.join('../models/', model)))
 
 labels = ['Buildings', 'Forest', 'Glacier', 'Mountains', 'Sea', 'Street']
+
+mean = np.array([0.5, 0.5, 0.5])
+std = np.array([0.25, 0.25, 0.25])
+
+data_transforms = transforms.Compose([
+    transforms.Resize((150, 150)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean, std)])
 
 title = "Scenery Classifier"
 
@@ -39,22 +45,21 @@ def examples():
 
 def predict(img):
     try:
-        img = torch.tensor(img).view(-1, 3, 150, 150)
+        img = data_transforms(img)
         img = img.to(device)
-        img = img.float()
-        img = img / 255.0
 
         with torch.no_grad():
             output = net(img)
 
             pred = [output[0][i].item() for i in range(len(labels))]
 
-    except:
+    except Exception as e:
         pred = [0 for i in range(len(labels))]
+        print(e)
 
     weightage = {labels[i]: pred[i] for i in range(len(labels))}
     return weightage
 
 
-gr.Interface(fn=predict, inputs=gr.Image(shape=(150, 150)),
+gr.Interface(fn=predict, inputs=gr.Image(shape=(150, 150), type='pil'),
              outputs='label', title=title, examples=examples()).launch()

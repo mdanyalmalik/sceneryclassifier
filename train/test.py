@@ -13,7 +13,6 @@ def test(net, device, print_acc=True):
 
     data_transforms = transforms.Compose([
         transforms.Resize((150, 150)),
-        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize(mean, std)])
 
