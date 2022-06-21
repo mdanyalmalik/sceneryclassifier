@@ -29,7 +29,7 @@ Through the use of 2d convolution operations, a convolutional neural network is 
 
 ## Authors
 
-Me: [@mdanyalmalik]
+Me: [@mdanyalmalik](https://github.com/mdanyalmalik/)
 
 ## License
 
