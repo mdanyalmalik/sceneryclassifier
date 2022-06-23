@@ -6,7 +6,7 @@ A scenery classifier made using a CNN in pytorch, with the help of the intel ima
 
 ## Description
 
-Through the use of 2d convolution operations, a convolutional neural network is constructed and trained. The model weights are stored in a .pth file. This model is loaded in the gradio interface to categorise images into the 6 categories, buildings, forest, glacier, mountains, sea and street.
+Through the use of transfer learning, the resnet18 model is fine-tuned by traininig it to fit this specific use-case. The model weights are stored in a .pth file. This model is loaded in the gradio interface to categorise images into the 6 categories, buildings, forest, glacier, mountains, sea and street.
 
 ## Getting Started
 
