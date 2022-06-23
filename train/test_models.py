@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import os
+from torchvision import models
 
 from test import test
-from net import Net
 
 
 if torch.cuda.is_available():
@@ -12,8 +12,10 @@ if torch.cuda.is_available():
 else:
     device = torch.device("cpu")
 
-net = Net()
-net.to(device)
+
+net = models.resnet18(pretrained=False)
+net.fc = nn.Linear(net.fc.in_features, 6)
+net = net.to(device)
 
 test_mode = 1  # 0 for single model, 1 for comparison
 
@@ -25,6 +27,7 @@ test_runs = 10  # number of times to test and avg
 if test_mode == 0:
     acc = 0
     net.load_state_dict(torch.load(os.path.join('../models/', model1)))
+    net.eval()
     for test_run in range(test_runs):
         acc += test(net, device)
     acc /= test_runs
@@ -36,6 +39,7 @@ elif test_mode == 1:
         acc = 0
 
         net.load_state_dict(torch.load(os.path.join('../models/', model)))
+        net.eval()
         for test_run in range(test_runs):
             acc += test(net, device, print_acc=False)
         acc /= test_runs

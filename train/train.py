@@ -10,7 +10,6 @@ import time
 import os
 
 from test import test
-from net import Net
 
 if torch.cuda.is_available():
     device = torch.device("cuda:0")
@@ -36,20 +35,22 @@ data_loader = torch.utils.data.DataLoader(
     image_dataset, batch_size=32, shuffle=True)
 
 
-net = Net().to(device)
+net = models.resnet18(pretrained=True)
+net.fc = nn.Linear(net.fc.in_features, 6)
+net = net.to(device)
 
-optimizer = optim.Adam(net.parameters(), lr=0.0005)
-loss_function = nn.MSELoss()
+optimizer = optim.Adam(net.parameters(), lr=0.0001)
+loss_function = nn.CrossEntropyLoss()
 
 
 def train(net, device):
     EPOCHS = 10
 
     for epoch in range(EPOCHS):
+        net.train()
         for inputs, labels in tqdm(data_loader):
             inputs = inputs.to(device)
-            labels = torch.tensor(np.array([np.eye(6)[i] for i in labels]))
-            labels = labels.float().to(device)
+            labels = labels.to(device)
 
             net.zero_grad()
 
@@ -58,8 +59,8 @@ def train(net, device):
             loss = loss_function(outputs, labels)
             loss.backward()
             optimizer.step()
-
         print(f"Epoch: {epoch+1}. Loss: {loss}")
+        net.eval()
         test(net, device)
 
 

@@ -1,11 +1,11 @@
 import gradio as gr
 import torch
-from torchvision import transforms
+import torch.nn as nn
+import torch.nn.functional as F
+from torchvision import transforms, models
 import numpy as np
 import random
 import os
-
-from net import Net
 
 if torch.cuda.is_available():
     device = torch.device("cuda:0")
@@ -13,11 +13,13 @@ else:
     device = torch.device("cpu")
 
 
-net = Net()
-net.to(device)
+net = models.resnet18(pretrained=False)
+net.fc = nn.Linear(net.fc.in_features, 6)
+net = net.to(device)
 
-model = "1655684183.7481008_Acc0.87_modelweights.pth"
+model = "1655988285.9725637_Acc0.88_modelweights.pth"
 net.load_state_dict(torch.load(os.path.join('../models/', model)))
+net.eval()
 
 labels = ['Buildings', 'Forest', 'Glacier', 'Mountains', 'Sea', 'Street']
 
@@ -47,11 +49,14 @@ def predict(img):
     try:
         img = data_transforms(img)
         img = img.to(device)
+        img = img.unsqueeze(0)
 
         with torch.no_grad():
             output = net(img)
+            output = F.softmax(output, dim=1)
 
             pred = [output[0][i].item() for i in range(len(labels))]
+            print(pred)
 
     except Exception as e:
         pred = [0 for i in range(len(labels))]
@@ -61,5 +66,5 @@ def predict(img):
     return weightage
 
 
-gr.Interface(fn=predict, inputs=gr.Image(shape=(150, 150), type='pil'),
+gr.Interface(fn=predict, inputs=gr.Image(type='pil'),
              outputs='label', title=title, examples=examples()).launch()
