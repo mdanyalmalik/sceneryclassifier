@@ -56,7 +56,6 @@ def predict(img):
             output = F.softmax(output, dim=1)
 
             pred = [output[0][i].item() for i in range(len(labels))]
-            print(pred)
 
     except Exception as e:
         pred = [0 for i in range(len(labels))]
