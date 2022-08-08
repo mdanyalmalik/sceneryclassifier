@@ -3,6 +3,7 @@ from torchvision import transforms, datasets
 import numpy as np
 
 
+# test function, print_acc decides whether the accuracy will be printed
 def test(net, device, print_acc=True):
     SIZE = 100
 
@@ -11,15 +12,18 @@ def test(net, device, print_acc=True):
     mean = np.array([0.5, 0.5, 0.5])
     std = np.array([0.25, 0.25, 0.25])
 
+    # defining transformations for test set
     data_transforms = transforms.Compose([
         transforms.Resize((150, 150)),
         transforms.ToTensor(),
         transforms.Normalize(mean, std)])
 
+    # loading test set
     image_dataset = datasets.ImageFolder(data_dir, data_transforms)
     data_loader = torch.utils.data.DataLoader(
         image_dataset, batch_size=SIZE, shuffle=True)
 
+    # loading one batch for testing
     inputs, labels = next(iter(data_loader))
     inputs, labels = inputs.to(device), labels.to(device)
 
