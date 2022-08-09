@@ -26,6 +26,7 @@ labels = ['Buildings', 'Forest', 'Glacier', 'Mountains', 'Sea', 'Street']
 mean = np.array([0.5, 0.5, 0.5])
 std = np.array([0.25, 0.25, 0.25])
 
+# defining data transformations
 data_transforms = transforms.Compose([
     transforms.Resize((150, 150)),
     transforms.ToTensor(),
@@ -34,7 +35,7 @@ data_transforms = transforms.Compose([
 title = "Scenery Classifier"
 
 
-def examples():
+def examples():  # loading example images
     number = 8
     egs = []
     for i in range(number):
